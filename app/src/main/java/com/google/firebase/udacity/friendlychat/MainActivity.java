@@ -16,6 +16,7 @@
 package com.google.firebase.udacity.friendlychat;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -186,6 +187,23 @@ public class MainActivity extends AppCompatActivity {
             } else if (resultCode == RESULT_CANCELED) {
                 Toast.makeText(this, "Signed canceled", Toast.LENGTH_LONG).show();
                 finish();
+            } else if (resultCode == RESULT_OK && requestCode == RC_PHOTO_PICKER) {
+                Uri selectedImageUri = data.getData();
+
+                /*// get a reference to store file at chat_photos/<FILENAME>
+                StorageReference photoRef = mChatPhotosStorageReference.child(selectedImageUri.getLastPathSegment());
+
+                // upload the file to Firebase Storage
+                UploadTask uploadTask = photoRef.putFile(selectedImageUri);
+                uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        @SuppressWarnings("VisibleForTests") Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                        FriendlyMessage friendlyMessage = new FriendlyMessage(null, mUsername, downloadUrl.toString());
+                        mMessageDatabaseReference.push().setValue(friendlyMessage);
+                    }
+                });*/
+
             }
         }
     }

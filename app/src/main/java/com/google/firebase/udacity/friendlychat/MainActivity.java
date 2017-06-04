@@ -15,10 +15,13 @@
  */
 package com.google.firebase.udacity.friendlychat;
 
+import android.Manifest;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.InputFilter;
@@ -36,6 +39,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -59,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
     public static final int RC_SIGN_IN = 1;
     private static final String TAG = "MainActivity";
     private static final int RC_PHOTO_PICKER = 2;
+    private static int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE;
 
     private ListView mMessageListView;
     private MessageAdapter mMessageAdapter;
@@ -117,9 +122,11 @@ public class MainActivity extends AppCompatActivity {
         mPhotoPickerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                System.out.println("=====================> botao clicado");
+                // request permission to read local images
+                // TODO: handle the permission to read images. Here only accept yes!
+                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType("image/jpeg");
+                intent.setType("image/*");
                 intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
                 startActivityForResult(Intent.createChooser(intent, "Complete action using"), RC_PHOTO_PICKER);
             }
@@ -217,6 +224,12 @@ public class MainActivity extends AppCompatActivity {
                     // set the download URL to the message box, so that the user can send it to the database
                     FriendlyMessage friendlyMessage = new FriendlyMessage(null, mUsername, downloadUrl.toString());
                     mMessageDatabaseReference.push().setValue(friendlyMessage);
+                }
+            });
+            uploadTask.addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Toast.makeText(MainActivity.this, "Not possible to upload the file", Toast.LENGTH_SHORT).show();
                 }
             });
         }
